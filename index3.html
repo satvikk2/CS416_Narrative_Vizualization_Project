@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Overall Fuel efficiency Heatmap</title>
+  <style>
+    .cell {
+      stroke: white;
+    }
+
+    .cell:hover {
+      fill: orange;
+      cursor: pointer;
+    }
+
+    .axis text {
+      font-family: sans-serif;
+      font-size: 12px;
+      transform: rotate(0);
+    }
+    .tooltip {
+      position: absolute;
+      visibility: visible;
+      background-color: white;
+      padding: 5px;
+    }
+    h1 {
+    margin-top: 50px;
+    text-transform: uppercase;
+    font-size: 40px;
+    color: black;
+    text-align: center;
+  }
+  p {
+  margin-left: 20px;
+  color: black;
+}
+body {
+    background-color: lavender;
+}
+#kobe{
+    margin-left: 20px;
+}
+#chart .x-axis-label {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+    }
+#chart .y-axis-label {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+}
+.link-container {
+  position: relative;
+  height: 200px;
+}
+
+.bottom-left-link {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+  </style>
+</head>
+<body>
+    <h1>Overall Fuel efficiency Heatmap</h1>
+    <p>Fuel efficiency pertains to how well a vehicle uses fuel. It's often confused with fuel economy, a specific term that refers to 
+        the distance a particular vehicle can travel on a certain amount of fuel. Cars with a lower fuel economy rating tend to cost more
+         to run and produce more pollution since they burn more fuel to travel the same distance. As you can see here, this heatmap separates
+         city MPG and highway MPG. Darker blue shades indicate a higher MPG and lighter shades indicate a lower MPG. On the x-axis lies 
+         the car brand. Scroll all the way to the right to see all the brands available. The y-axis axis represents the number of engine 
+         cylinders available. If you hover over each cell, the city MPG or highway MPG is displayed based on the selection you make. 
+    </p>
+  <label id="kobe">
+    Choose MPG Type:
+    <select id="mpg-type">
+      <option value="AverageCityMPG">City MPG</option>
+      <option value="AverageHighwayMPG">Highway MPG</option>
+    </select>
+  </label>
+  <svg id="heatmap"></svg>
+  <div id="tooltip" class="tooltip"></div>
+
+  <div class="'link-container">
+    <a class ="bottom-left-link" href="./index2.html">Previous Page: Fuel-Based Analysis of Engine Cylinders</a>
+</div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    var data = [
+  { Make: "Acura", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 35, AverageCityMPG: 25 },
+  { Make: "Acura", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 21 },
+  { Make: "Alfa Romeo", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 24 },
+  { Make: "Alfa Romeo", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 17 },
+  { Make: "Aston Martin", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 19, AverageCityMPG: 12 },
+  { Make: "Audi", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 23 },
+  { Make: "Audi", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 19 },
+  { Make: "Audi", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 26, AverageCityMPG: 17 },
+  { Make: "Audi", Fuel: "Gasoline", EngineCylinders: 10, AverageHighwayMPG: 22, AverageCityMPG: 14 },
+  { Make: "Audi", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 32, AverageCityMPG: 24 },
+  { Make: "Bentley", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 13 },
+  { Make: "Bentley", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 20, AverageCityMPG: 12 },
+  { Make: "BMW", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 41, AverageCityMPG: 30 },
+  { Make: "BMW", Fuel: "Diesel", EngineCylinders: 6, AverageHighwayMPG: 29, AverageCityMPG: 23 },
+  { Make: "BMW", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 109, AverageCityMPG: 133 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 2, AverageHighwayMPG: 33, AverageCityMPG: 36 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 3, AverageHighwayMPG: 29, AverageCityMPG: 28 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 32, AverageCityMPG: 23 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 19 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 15 },
+  { Make: "BMW", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 20, AverageCityMPG: 13 },
+  { Make: "Buick", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 20 },
+  { Make: "Buick", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 23 },
+  { Make: "Buick", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 26, AverageCityMPG: 18 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 22 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 25, AverageCityMPG: 17 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 14 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 32, AverageCityMPG: 22 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 26, AverageCityMPG: 18 },
+  { Make: "Cadillac", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 15 },
+  { Make: "Chevrolet", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 29, AverageCityMPG: 21 },
+  { Make: "Chevrolet", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 110, AverageCityMPG: 128 },
+  { Make: "Chevrolet", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 21 },
+  { Make: "Chevrolet", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 15 },
+  { Make: "Chevrolet", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 34, AverageCityMPG: 27 },
+  { Make: "Chevrolet", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 17 },
+  { Make: "Chevrolet", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 15 },
+  { Make: "Chrysler", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 25, AverageCityMPG: 16 },
+  { Make: "Chrysler", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 36, AverageCityMPG: 23 },
+  { Make: "Chrysler", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 29, AverageCityMPG: 20 },
+  { Make: "Dodge", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 24, AverageCityMPG: 15 },
+  { Make: "Dodge", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 14 },
+  { Make: "Dodge", Fuel: "Gasoline", EngineCylinders: 10, AverageHighwayMPG: 19, AverageCityMPG: 12 },
+  { Make: "Dodge", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 25, AverageCityMPG: 19 },
+  { Make: "Dodge", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 18 },
+  { Make: "Ferrari", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 16 },
+  { Make: "Ferrari", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 16, AverageCityMPG: 12 },
+  { Make: "Fiat", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 103, AverageCityMPG: 121 },
+  { Make: "Fiat", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 34, AverageCityMPG: 26 },
+  { Make: "Fiat", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 22 },
+  { Make: "Ford", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 96, AverageCityMPG: 118 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 25, AverageCityMPG: 19 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 18, AverageCityMPG: 11 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 14 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 3, AverageHighwayMPG: 40, AverageCityMPG: 29 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 24 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 23, AverageCityMPG: 17 },
+  { Make: "Ford", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 15 },
+  { Make: "Genesis", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 17 },
+  { Make: "Genesis", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 15 },
+  { Make: "Genesis", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 17 },
+  { Make: "GMC", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 29, AverageCityMPG: 21 },
+  { Make: "GMC", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 20 },
+  { Make: "GMC", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 23, AverageCityMPG: 17 },
+  { Make: "GMC", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 15 },
+  { Make: "Honda", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 38, AverageCityMPG: 30 },
+  { Make: "Honda", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 37, AverageCityMPG: 29 },
+  { Make: "Honda", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 19 },
+  { Make: "Hyundai", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 122, AverageCityMPG: 150 },
+  { Make: "Hyundai", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 34, AverageCityMPG: 27 },
+  { Make: "Hyundai", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 25, AverageCityMPG: 18 },
+  { Make: "Infiniti", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 22 },
+  { Make: "Infiniti", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 20 },
+  { Make: "Infiniti", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 15 },
+  { Make: "Infiniti", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 25 },
+  { Make: "Jaguar", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 39, AverageCityMPG: 30 },
+  { Make: "Jaguar", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 21 },
+  { Make: "Jaguar", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 26, AverageCityMPG: 18 },
+  { Make: "Jaguar", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 15 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 19 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 14 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 24 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 19, AverageCityMPG: 13 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 21 },
+  { Make: "Jeep", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 22, AverageCityMPG: 17 },
+  { Make: "Kia", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 92, AverageCityMPG: 120 },
+  { Make: "Kia", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 15 },
+  { Make: "Kia", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 27 },
+  { Make: "Kia", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 25, AverageCityMPG: 18 },
+  { Make: "Lamborghini", Fuel: "Gasoline", EngineCylinders: 10, AverageHighwayMPG: 21, AverageCityMPG: 14 },
+  { Make: "Lamborghini", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 17, AverageCityMPG: 10 },
+  { Make: "Land Rover", Fuel: "Diesel", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 22 },
+  { Make: "Land Rover", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 20 },
+  { Make: "Land Rover", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 23, AverageCityMPG: 17 },
+  { Make: "Land Rover", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 19, AverageCityMPG: 14 },
+  { Make: "Lexus", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 22 },
+  { Make: "Lexus", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 21 },
+  { Make: "Lexus", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 16 },
+  { Make: "Lexus", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 36, AverageCityMPG: 39 },
+  { Make: "Lexus", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 20 },
+  { Make: "Lincoln", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 29, AverageCityMPG: 23 },
+  { Make: "Lincoln", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 16 },
+  { Make: "Lotus", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 17 },
+  { Make: "Maserati", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 16 },
+  { Make: "Maserati", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 20, AverageCityMPG: 14 },
+  { Make: "Mazda", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 34, AverageCityMPG: 26 },
+  { Make: "Mazda", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 35, AverageCityMPG: 27 },
+  { Make: "McLaren Automotive", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 16 },
+  { Make: "Mercedes-Benz", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 82, AverageCityMPG: 85 },
+  { Make: "Mercedes-Benz", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 23 },
+  { Make: "Mercedes-Benz", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 25, AverageCityMPG: 19 },
+  { Make: "Mercedes-Benz", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 22, AverageCityMPG: 16 },
+  { Make: "Mercedes-Benz", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 20, AverageCityMPG: 13 },
+  { Make: "MINI", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 24 },
+  { Make: "Mitsubishi", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 102, AverageCityMPG: 121 },
+  { Make: "Mitsubishi", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 27, AverageCityMPG: 20 },
+  { Make: "Mitsubishi", Fuel: "Gasoline", EngineCylinders: 3, AverageHighwayMPG: 42, AverageCityMPG: 35 },
+  { Make: "Mitsubishi", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 24 },
+  { Make: "Nissan", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 101, AverageCityMPG: 124 },
+  { Make: "Nissan", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 31, AverageCityMPG: 26 },
+  { Make: "Nissan", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 26, AverageCityMPG: 18 },
+  { Make: "Nissan", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 26 },
+  { Make: "Nissan", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 25, AverageCityMPG: 18 },
+  { Make: "Nissan", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 20, AverageCityMPG: 14 },
+  { Make: "Porsche", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 21 },
+  { Make: "Porsche", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 26, AverageCityMPG: 19 },
+  { Make: "Porsche", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 14 },
+  { Make: "Ram", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 21, AverageCityMPG: 14 },
+  { Make: "Ram", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 28, AverageCityMPG: 21 },
+  { Make: "Ram", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 24, AverageCityMPG: 17 },
+  { Make: "Rolls-Royce", Fuel: "Gasoline", EngineCylinders: 12, AverageHighwayMPG: 19, AverageCityMPG: 12 },
+  { Make: "Roush Performance", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 23, AverageCityMPG: 14 },
+  { Make: "smart", Fuel: "Gasoline", EngineCylinders: 3, AverageHighwayMPG: 39, AverageCityMPG: 32 },
+  { Make: "Subaru", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 27, AverageCityMPG: 21 },
+  { Make: "Subaru", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 25 },
+  { Make: "Subaru", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 20 },
+  { Make: "Tesla", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 98, AverageCityMPG: 92 },
+  { Make: "Toyota", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 93, AverageCityMPG: 110 },
+  { Make: "Toyota", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 25 },
+  { Make: "Toyota", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 22 },
+  { Make: "Toyota", Fuel: "Gasoline", EngineCylinders: 8, AverageHighwayMPG: 17, AverageCityMPG: 13 },
+  { Make: "Toyota", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 36, AverageCityMPG: 28 },
+  { Make: "Toyota", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 35, AverageCityMPG: 27 },
+  { Make: "Volkswagen", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 41, AverageCityMPG: 30 },
+  { Make: "Volkswagen", Fuel: "Diesel", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 21 },
+  { Make: "Volkswagen", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 109, AverageCityMPG: 127 },
+  { Make: "Volkswagen", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 36, AverageCityMPG: 29 },
+  { Make: "Volkswagen", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 38, AverageCityMPG: 30 },
+  { Make: "Volkswagen", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 29, AverageCityMPG: 22 },
+  { Make: "Volkswagen", Fuel: "Gasoline", EngineCylinders: 6, AverageHighwayMPG: 28, AverageCityMPG: 20 },
+  { Make: "Volkswagen", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 32, AverageCityMPG: 25 },
+  { Make: "Volvo", Fuel: "Diesel", EngineCylinders: 4, AverageHighwayMPG: 39, AverageCityMPG: 30 },
+  { Make: "Volvo", Fuel: "Electricity", EngineCylinders: 0, AverageHighwayMPG: 94, AverageCityMPG: 110 },
+  { Make: "Volvo", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 33, AverageCityMPG: 25 },
+  { Make: "Volvo", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 30, AverageCityMPG: 23 },
+  { Make: "Volvo", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 32, AverageCityMPG: 23 },
+  { Make: "Volvo", Fuel: "Gasoline", EngineCylinders: 4, AverageHighwayMPG: 34, AverageCityMPG: 25 }
+];
+    var margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    var width = 5550;
+    var height = 800;
+    var svg = d3.select("#heatmap").attr("width", width).attr("height", height);
+    var xScale = d3.scaleBand().domain(data.map(d => d.Make)).range([50, width - 50]).padding(0.1);
+    var yScale = d3.scaleBand().domain(data.map(d => d.EngineCylinders).sort((a, b) => a - b)).range([50, height - 50]).padding(0.1);
+    var colorScale = d3.scaleLinear().domain([0, d3.max(data, d => d.AverageHighwayMPG)]).range(["lightblue", "blue"]);
+    var xAxis = d3.axisBottom(xScale).tickSize(0); 
+    var yAxis = d3.axisLeft(yScale);
+    var maxMPG = d3.max(data, d => d.AverageHighwayMPG);
+    var maxMPGData = data.find(d => d.AverageHighwayMPG === maxMPG);
+    svg.append("text").attr("x", xScale(maxMPGData.Make) + xScale.bandwidth() / 2 + 120).attr("y", yScale(maxMPGData.EngineCylinders) + yScale.bandwidth() / 2).attr("text-anchor", "middle").attr("dy", "0.35em").style("fill", "black").style("font-size", "20px").text("<-- Highest MPG value");
+    svg.append("g").attr("class", "axis").attr("transform", "translate(0," + (height - 50) + ")").call(xAxis).selectAll("text").attr("y", 5).attr("x", 0) .style("text-anchor", "end"); 
+    svg.append("g").attr("class", "axis").attr("transform", "translate(50,0)").call(yAxis);
+    svg.append("text").attr("class", "x-axis-label").attr("x", width / 2).attr("y", height).style("text-anchor", "middle").text("Car Brand");
+    svg.append("text").attr("class", "y-axis-label").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", margin.left - 30).attr("dy", "1em").style("text-anchor", "middle").text("Number of Cylinders");
+
+
+    function updateHeatmap(mpgType) {
+      var cellSize = Math.min(xScale.bandwidth(), yScale.bandwidth());
+        var tooltip = d3.select("#tooltip");
+         var mouseover = function(event, d) {
+        tooltip.style("opacity", 1).html(mpgType === "AverageCityMPG" ? "Average City MPG: " + d.AverageCityMPG : "Average Highway MPG: " + d.AverageHighwayMPG);
+        d3.select(this).style("stroke", "red").style("opacity", 1);
+      };
+      
+      var mousemove = function(event) {
+        tooltip.style("left", event.pageX + "px").style("top", (event.pageY + 10) + "px");
+      };
+
+      var mouseleave = function(d) {
+        tooltip.style("opacity", 0);
+        d3.select(this).style("stroke", "none").style("opacity", 0.8);
+      };
+
+      svg.selectAll(".cell").data(data).join("rect").attr("class", "cell").attr("x", d => xScale(d.Make)) .attr("y", d => yScale(d.EngineCylinders)) .attr("width", cellSize).attr("height", cellSize).attr("fill", d => colorScale(d[mpgType])).on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
+    }
+    
+    updateHeatmap("AverageCityMPG");
+    document.getElementById("mpg-type").addEventListener("change", function () {
+      var selectedType = this.value;
+      updateHeatmap(selectedType);
+    });
+  </script>
+</body>
+</html>
